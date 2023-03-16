@@ -12,6 +12,7 @@ import com.dre.brewery.integration.barrel.WGBarrel5;
 import com.dre.brewery.integration.barrel.WGBarrel6;
 import com.dre.brewery.integration.barrel.WGBarrel7;
 import com.dre.brewery.integration.item.BreweryPluginItem;
+import com.dre.brewery.integration.item.ItemsAdderPluginItem;
 import com.dre.brewery.integration.item.MMOItemsPluginItem;
 import com.dre.brewery.integration.item.SlimefunPluginItem;
 import com.dre.brewery.recipe.BCauldronRecipe;
@@ -57,6 +58,7 @@ public class BConfig {
 	public static boolean useGMInventories; // GamemodeInventories
 	public static boolean hasSlimefun; // Slimefun
 	public static Boolean hasMMOItems = null; // MMOItems ; Null if not checked
+	public static Boolean hasItemsAdder = null; // ItemsAdder Items ; Null if not checked
 	public static boolean hasChestShop;
 	public static boolean hasShopKeepers;
 
@@ -262,6 +264,7 @@ public class BConfig {
 		PluginItem.registerForConfig("mmoitems", MMOItemsPluginItem::new);
 		PluginItem.registerForConfig("slimefun", SlimefunPluginItem::new);
 		PluginItem.registerForConfig("exoticgarden", SlimefunPluginItem::new);
+		PluginItem.registerForConfig("itemsAdder", ItemsAdderPluginItem::new);
 
 		// Loading custom items
 		ConfigurationSection configSection = config.getConfigurationSection("customItems");
