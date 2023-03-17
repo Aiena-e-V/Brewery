@@ -15,6 +15,7 @@ import com.dre.brewery.integration.item.BreweryPluginItem;
 import com.dre.brewery.integration.item.ItemsAdderPluginItem;
 import com.dre.brewery.integration.item.MMOItemsPluginItem;
 import com.dre.brewery.integration.item.SlimefunPluginItem;
+import com.dre.brewery.listeners.ItemsAdderListener;
 import com.dre.brewery.recipe.BCauldronRecipe;
 import com.dre.brewery.recipe.BRecipe;
 import com.dre.brewery.recipe.PluginItem;
@@ -27,6 +28,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginManager;
 
@@ -58,7 +60,7 @@ public class BConfig {
 	public static boolean useGMInventories; // GamemodeInventories
 	public static boolean hasSlimefun; // Slimefun
 	public static Boolean hasMMOItems = null; // MMOItems ; Null if not checked
-	public static Boolean hasItemsAdder = null; // ItemsAdder Items ; Null if not checked
+	public static Boolean hasItemsAdder = false; // ItemsAdder Items
 	public static boolean hasChestShop;
 	public static boolean hasShopKeepers;
 
@@ -73,7 +75,7 @@ public class BConfig {
 	public static boolean minimalParticles;
 
 	//BPlayer
-	public static Map<Material, Integer> drainItems = new HashMap<>();// DrainItem Material and Strength
+	public static Map<ItemStack, Integer> drainItems = new HashMap<>();// DrainItem Material and Strength
 	public static Material pukeItem;
 	public static boolean showStatusOnDrink;
 	public static int pukeDespawntime;
@@ -220,6 +222,10 @@ public class BConfig {
 		hasShopKeepers = plMan.isPluginEnabled("Shopkeepers");
 		hasSlimefun = plMan.isPluginEnabled("Slimefun");
 
+		if (plMan.isPluginEnabled("ItemsAdder")) {
+			plMan.registerEvents(new ItemsAdderListener(), p);
+		}
+
 		// various Settings
 		DataSave.autosave = config.getInt("autosave", 3);
 		P.debug = config.getBoolean("debug", false);
@@ -320,26 +326,38 @@ public class BConfig {
 
 		// loading drainItems
 		List<String> drainList = config.getStringList("drainItems");
-		if (drainList != null) {
-			for (String drainString : drainList) {
-				String[] drainSplit = drainString.split("/");
-				if (drainSplit.length > 1) {
-					Material mat = Material.matchMaterial(drainSplit[0]);
-					int strength = p.parseInt(drainSplit[1]);
-					if (mat == null && hasVault && strength > 0) {
-						try {
-							net.milkbowl.vault.item.ItemInfo vaultItem = net.milkbowl.vault.item.Items.itemByString(drainSplit[0]);
-							if (vaultItem != null) {
-								mat = vaultItem.getType();
-							}
-						} catch (Exception e) {
-							P.p.errorLog("Could not check vault for Item Name");
-							e.printStackTrace();
-						}
+		for (String drainString : drainList) {
+			String[] drainSplit = drainString.split("/");
+			if (drainSplit.length == 1) {
+				continue;
+			}
+
+			int strength = p.parseInt(drainSplit[1]);
+			if (strength <= 0) {
+				continue;
+			}
+
+			Material mat = Material.matchMaterial(drainSplit[0]);
+			if (mat != null) {
+				drainItems.put(new ItemStack(mat), strength);
+				continue;
+			}
+
+			if (hasItemsAdder) {
+				dev.lone.itemsadder.api.CustomStack itemsAdderItem = dev.lone.itemsadder.api.CustomStack.getInstance(drainSplit[0]);
+				drainItems.put(itemsAdderItem.getItemStack(), strength);
+				continue;
+			}
+
+			if (hasVault) {
+				try {
+					net.milkbowl.vault.item.ItemInfo vaultItem = net.milkbowl.vault.item.Items.itemByString(drainSplit[0]);
+					if (vaultItem != null) {
+						drainItems.put(new ItemStack(vaultItem.getType()), strength);
 					}
-					if (mat != null && strength > 0) {
-						drainItems.put(mat, strength);
-					}
+				} catch (Exception e) {
+					P.p.errorLog("Could not check vault for Item Name");
+					e.printStackTrace();
 				}
 			}
 		}

@@ -337,9 +337,15 @@ public class BPlayer {
 	}
 
 	// Eat something to drain the drunkeness
-	public void drainByItem(Player player, Material mat) {
-		int strength = BConfig.drainItems.get(mat);
-		if (drain(player, strength)) {
+	public void drainByItem(Player player, ItemStack itemStack) {
+		Optional<Map.Entry<ItemStack, Integer>> drainItem = BConfig.drainItems.entrySet().stream().filter(
+			entry -> entry.getKey().isSimilar(itemStack)
+		).findFirst();
+		if (!drainItem.isPresent()) {
+			return;
+		}
+
+		if (drain(player, drainItem.get().getValue())) {
 			remove(player);
 		}
 	}

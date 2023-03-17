@@ -190,10 +190,10 @@ public class PlayerListener implements Listener {
 						}
 					}
 				}
-			} else if (BConfig.drainItems.containsKey(item.getType())) {
+			} else {
 				BPlayer bplayer = BPlayer.get(player);
 				if (bplayer != null) {
-					bplayer.drainByItem(player, item.getType());
+					bplayer.drainByItem(player, item);
 					if (BConfig.showStatusOnDrink) {
 						bplayer.showDrunkeness(player);
 					}

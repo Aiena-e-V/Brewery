@@ -10,10 +10,6 @@ public class ItemsAdderPluginItem extends PluginItem {
 
 	@Override
 	public boolean matches(ItemStack item) {
-		if(BConfig.hasItemsAdder == null){
-			BConfig.hasItemsAdder = P.p.getServer().getPluginManager().isPluginEnabled("ItemsAdder");
-		}
-
 		if(!BConfig.hasItemsAdder) return false;
 
 		CustomStack cs = CustomStack.byItemStack(item);
