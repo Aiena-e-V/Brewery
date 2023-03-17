@@ -345,8 +345,10 @@ public class BConfig {
 
 			if (hasItemsAdder) {
 				dev.lone.itemsadder.api.CustomStack itemsAdderItem = dev.lone.itemsadder.api.CustomStack.getInstance(drainSplit[0]);
-				drainItems.put(itemsAdderItem.getItemStack(), strength);
-				continue;
+				if (itemsAdderItem != null) {
+					drainItems.put(itemsAdderItem.getItemStack(), strength);
+					continue;
+				}
 			}
 
 			if (hasVault) {
